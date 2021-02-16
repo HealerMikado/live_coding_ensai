@@ -26,8 +26,8 @@ def main(client_rule: TwitterClientRule = Provide[Container.twitter_client_rule]
     client_rule.add_rules(rules=rules)
 
     # Création de l'objet python qui gère la connexion au stream de tweet
-    stream = client_stream.get_stream()
-    write_tweet_service.stream_to_file(stream)
+    with client_stream.get_stream() as stream:
+        write_tweet_service.stream_to_file(stream)
 
 
 if __name__ == '__main__':
@@ -35,7 +35,7 @@ if __name__ == '__main__':
                         , level=logging.INFO
                         , format='%(asctime)s | %(levelname)s | %(message)s'
                         , datefmt='%m/%d/%Y %I:%M:%S %p')
-    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+    #logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     dotenv.load_dotenv()
     container = Container()
     container.config.bearer_token.from_env('BEARER_TOKEN')

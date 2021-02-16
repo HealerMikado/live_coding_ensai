@@ -1,2 +1,5 @@
 {"expression":"has cat", "tag":"user define cat rule"}
 {"expression":"had dog", "tag":"user define dog rule"}
+{"expression":"had donald trump", "tag":"user define donald trump rule"}
+{"expression":"had elon musk", "tag":"user define elon musk rule"}
+{"expression":"had COVID OR COVID19 OR #covid19", "tag":"user define covid rule"}

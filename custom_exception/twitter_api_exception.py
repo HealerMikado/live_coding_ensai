@@ -1,0 +1,2 @@
+class TwitterApiException(Exception):
+    pass

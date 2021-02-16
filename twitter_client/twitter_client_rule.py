@@ -1,10 +1,21 @@
 import logging
-import os
 from typing import List
 
 import requests
 
 from businness_object.rule import Rule
+from custom_exception.twitter_api_exception import TwitterApiException
+
+
+def is_match_save_rules(rule, saved_rules):
+    matched_rule = None
+    i = 0
+    while matched_rule is None and i < len(saved_rules):
+        if rule.expression == saved_rules[i].expression:
+            matched_rule = saved_rules[i]
+        i += 1
+    logging.info("I found a matching rule based on expression")
+    return matched_rule
 
 
 class TwitterClientRule:
@@ -13,12 +24,11 @@ class TwitterClientRule:
     def __init__(self, bearer_token):
         self.__bearer_token = bearer_token
 
-
     def add_rule(self, rule: Rule) -> Rule:
         """
         Permet d'ajouter une règle pour filtrer le flux de tweets
         :param rule: La règle à ajouter
-        :type value: Rule
+        :type rule: Rule
         :return: la règle mise à jour de son id
         :rtype: Rule
         """
@@ -43,8 +53,8 @@ class TwitterClientRule:
 
         # Si la requête n'a pas aboutie correctement on lève une erreur
         if response.status_code != 201:
-            raise Exception(f'Problème lors de la création de règle\n'
-                            f'{response.status_code} : {response.content}')
+            raise TwitterApiException(f'Problème lors de la création de règle\n'
+                                      f'{response.status_code} : {response.content}')
 
         # Mise  à jour de l'id de la règle avec l'id renvoyé par twitter
         rule.id = response.json()["data"][0]["id"]
@@ -56,7 +66,7 @@ class TwitterClientRule:
         """
         Permet d'ajouter plusieurs règles pour filtrer le flux de tweets
         :param rules: La règle à ajouter
-        :type value: list of Rule
+        :type rules: list of Rule
         :return: les règles mise à jour de leur id
         :rtype: list of Rule
         """
@@ -69,7 +79,7 @@ class TwitterClientRule:
 
         # Création du corps
         body = {
-            "add": [{"value" :rule.expression , "tag" : rule.tag }for rule in rules]
+            "add": [{"value": rule.expression, "tag": rule.tag} for rule in rules]
         }
         # Exécution de la requête
         response = requests.post(url=TwitterClientRule.__ENDPOINT_RULE
@@ -78,15 +88,15 @@ class TwitterClientRule:
 
         # Si la requête n'a pas aboutie correctement on lève une erreur
         if response.status_code != 201:
-            raise Exception(f'Problème lors de la création de règle\n'
-                            f'{response.status_code} : {response.content}')
+            raise TwitterApiException(f'Problème lors de la création de règle\n'
+                                      f'{response.status_code} : {response.content}')
 
         # Creation de nouveau objet rules
         new_rules = []
         for rule in response.json()["data"]:
             new_rules.append(Rule(expression=rule["value"]
-                                  ,tag=rule["tag"]
-                                  ,id=rule["id"]))
+                                  , tag=rule["tag"]
+                                  , id=rule["id"]))
         logging.info(f'rules add {new_rules}')
         return new_rules
 
@@ -103,7 +113,7 @@ class TwitterClientRule:
         """
         logging.info(f'deleting rule {rule}')
         saved_rules = self.get_all_rules()
-        matched_rule = self.is_match_save_rules(rule, saved_rules)
+        matched_rule = is_match_save_rules(rule, saved_rules)
         if matched_rule is not None:
             self.delete_rule_effectively(rule)
         logging.info(f'rule deleted')
@@ -128,18 +138,8 @@ class TwitterClientRule:
                                  , json=body)
         # Si la requête n'a pas aboutie correctement on lève une erreur
         if response.status_code != 200:
-            raise Exception(f'Problème lors de la suppression de règle\n'
-                            f'{response.status_code} : {response.content}')
-
-    def is_match_save_rules(self, rule, saved_rules):
-        matched_rule = None
-        i = 0
-        while matched_rule is None and i < len(saved_rules):
-            if rule.expression == saved_rules[i].expression:
-                matched_rule == saved_rules[i]
-            i += 1
-        logging.info("I found a matching rule based on expression")
-        return matched_rule
+            raise TwitterApiException(f'Problème lors de la suppression de règle\n'
+                                      f'{response.status_code} : {response.content}')
 
     def get_all_rules(self) -> List[Rule]:
         """
@@ -155,11 +155,11 @@ class TwitterClientRule:
         }
         # Exécution de la requête
         response = requests.get(url=TwitterClientRule.__ENDPOINT_RULE
-                                 , headers=headers)
+                                , headers=headers)
         # Si la requête n'a pas aboutie correctement on lève une erreur
         if response.status_code != 200:
-            raise Exception(f'Problème lors de la récupération des règles\n'
-                            f'{response.status_code} : {response.content}')
+            raise TwitterApiException(f'Problème lors de la récupération des règles\n'
+                                      f'{response.status_code} : {response.content}')
 
         saved_rules = []
         # Check if the data key is present
@@ -183,5 +183,5 @@ class TwitterClientRule:
         if len(rules_to_delete):
             self.delete_rule_effectively(rules_to_delete)
             logging.info("All the rules deleted")
-        else :
+        else:
             logging.info("No rule to delete")

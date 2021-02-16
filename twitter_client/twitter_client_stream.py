@@ -2,6 +2,8 @@ import os
 
 import requests
 
+from custom_exception.twitter_api_exception import TwitterApiException
+
 
 class TwitterClientStream:
     __URL_STREAM = "https://api.twitter.com/2/tweets/search/stream"
@@ -33,7 +35,7 @@ class TwitterClientStream:
                               , stream=True)
 
         if stream.status_code !=200 :
-            raise Exception(f'Problème lors de la récupération du flux \n'
+            raise TwitterApiException(f'Problème lors de la récupération du flux \n'
                             f'{stream.content}')
 
         return stream
