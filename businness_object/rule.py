@@ -1,8 +1,16 @@
+
+
 class Rule:
-    def __init__(self, expression:str, tag:str="", id:str=""):
+    def __init__(self, expression: str, tag: str = "", id: str = ""):
         self.__expression = expression
         self.__tag = tag
         self.__id = id
+
+    def __str__(self) -> str:
+        return f'Rule [id {self.__id}, expression {self.__expression}, tag {self.__tag}]'
+
+    def __repr__(self) -> str:
+        return f'Rule [id {self.__id}, expression {self.__expression}, tag {self.__tag}]'
 
     @property
     def id(self):

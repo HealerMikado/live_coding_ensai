@@ -2,8 +2,10 @@ venv/
 
 .env
 
-*.jsonl
+output/
 
 .idea/
 
 __pycache__/
+
+*.log
