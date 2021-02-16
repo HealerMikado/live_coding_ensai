@@ -17,6 +17,8 @@ pip install -r requirements.txt
 
 ### Accès à l'API Twitter v2
 
-Un accès à l'API twitter V2 est nécessaire. Toutes les infos sont [ici](https://developer.twitter.com/en/apply-for-access). Une fois votre accès 
-validé, il vous faudra générer un **BEARER_TOKEN**, modifier le fichier `.env`
+Un accès à l'API twitter V2 est nécessaire. Toutes les infos sont 
+[ici](https://developer.twitter.com/en/apply-for-access). Une fois votre accès 
+validé, il vous faudra générer un **BEARER_TOKEN** et créer le 
+fichier `. env` en vous inpirant du fichier `template.env`
 
